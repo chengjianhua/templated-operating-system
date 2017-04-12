@@ -39,8 +39,6 @@ FastClick.attach(document.body);
 const container = document.getElementById('app');
 const muiTheme = getMuiTheme({ userAgent: navigator.userAgent });
 
-let routes = require('./routes').default;
-
 function render(routesRender) {
   // eslint-disable-next-line
   return ReactDOM.render(
@@ -55,6 +53,7 @@ function render(routesRender) {
   );
 }
 
+let routes = require('./routes').default;
 // eslint-disable-next-line
 let appInstance = render(routes);
 

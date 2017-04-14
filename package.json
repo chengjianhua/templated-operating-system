@@ -54,12 +54,15 @@
     "react-dom": "^15.4.2",
     "react-draggable": "^2.2.3",
     "react-grid-layout": "^0.14.4",
+    "react-helmet": "^5.0.3",
+    "react-perimeter": "^0.3.0",
     "react-router": "^4.1.0",
     "react-router-dom": "^4.1.0",
     "react-tap-event-plugin": "^2.0.1",
     "sequelize": "^3.30.1",
     "source-map-support": "^0.4.11",
-    "sqlite3": "^3.1.8"
+    "sqlite3": "^3.1.8",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "assets-webpack-plugin": "^3.5.1",

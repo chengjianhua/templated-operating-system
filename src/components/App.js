@@ -28,7 +28,7 @@ const ContextType = {
  *     container,
  *   );
  */
-class App extends React.PureComponent {
+class App extends React.Component {
 
   static propTypes = {
     context: PropTypes.shape(ContextType).isRequired,

@@ -1,0 +1,34 @@
+.root {
+  display: flex;
+}
+
+.preview {
+  flex: 0 0 auto;
+  width: 375px;
+  height: 667px;
+
+  :global .react-grid-item {
+    border: 1px solid rgba(0, 255, 0, 0.2);
+  }
+}
+
+.operationPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.moduleWrapper {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: flex-start;
+
+  & > * {
+    max-width: 375px;
+    flex: 0 1 auto;
+  }
+}
+
+.moduleWrapper .module {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}

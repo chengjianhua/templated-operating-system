@@ -14,9 +14,7 @@ const routes = (
   <Layout>
     <Switch>
       <Route exact path="/" component={Home} />
-
       <Route path="/components" component={Components} />
-
       <Route path="/build" component={Build} />
     </Switch>
   </Layout>

@@ -6,7 +6,7 @@ import expressJwt from 'express-jwt';
 // import jwt from 'jsonwebtoken';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
-import { StaticRouter } from 'react-router-dom';
+import { StaticRouter as Router } from 'react-router-dom';
 import PrettyError from 'pretty-error';
 
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
@@ -89,7 +89,7 @@ app.get('*', async (req, res, next) => {
     };
     data.children = ReactDOM.renderToString(
       <MuiThemeProvider muiTheme={muiTheme}>
-        <StaticRouter
+        <Router
           basename="/app"
           location={req.url}
           context={routerContext}
@@ -97,7 +97,7 @@ app.get('*', async (req, res, next) => {
           <App context={appContext}>
             {routes}
           </App>
-        </StaticRouter>
+        </Router>
       </MuiThemeProvider>,
     );
     data.styles = [

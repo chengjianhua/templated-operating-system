@@ -1,0 +1,80 @@
+{
+  "Button/Button.js": {
+    "description": "",
+    "displayName": "Button",
+    "methods": [],
+    "props": {
+      "label": {
+        "type": {
+          "name": "node"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "\"按钮\"",
+          "computed": false
+        }
+      },
+      "fullWidth": {
+        "type": {
+          "name": "bool"
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "true",
+          "computed": false
+        }
+      }
+    },
+    "composes": [
+      "material-ui/FlatButton"
+    ]
+  },
+  "ImageCard/ImageCard.js": {
+    "description": "",
+    "displayName": "ImageCard",
+    "methods": [],
+    "props": {
+      "user": {
+        "type": {
+          "name": "shape",
+          "value": {
+            "avatar": {
+              "name": "any",
+              "required": false
+            },
+            "nick": {
+              "name": "string",
+              "required": false
+            },
+            "signature": {
+              "name": "string",
+              "required": false
+            },
+            "test": {
+              "name": "shape",
+              "value": {
+                "a": {
+                  "name": "string",
+                  "required": false
+                },
+                "b": {
+                  "name": "string",
+                  "required": false
+                }
+              },
+              "required": false
+            }
+          }
+        },
+        "required": false,
+        "description": "",
+        "defaultValue": {
+          "value": "{\n  \"avatar\": \"https://api.adorable.io/avatars/100/jianhua.cheng\",\n  \"nick\": \"Avatar\",\n  \"signature\": \"To be or not to be.\"\n}",
+          "computed": false
+        }
+      }
+    }
+  }
+}

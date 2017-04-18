@@ -75,6 +75,8 @@ const config = {
             ...isDebug ? ['transform-react-jsx-self'] : [],
 
             ['transform-decorators-legacy'],
+
+            ['transform-react-display-name'],
           ],
         },
       },

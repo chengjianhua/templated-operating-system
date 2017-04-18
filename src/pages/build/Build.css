@@ -1,34 +1,62 @@
+:root {
+  --build-modules-container-width: 375px;
+  --build-modules-container-scale-ratio: 0.8;
+}
+
 .root {
   display: flex;
+  justify-content: space-between;
 }
 
-.preview {
-  flex: 0 0 auto;
-  width: 375px;
-  height: 667px;
-
-  :global .react-grid-item {
-    border: 1px solid rgba(0, 255, 0, 0.2);
-  }
+.modulesWrapper {
+  flex: 0 1 auto;
 }
 
-.operationPanel {
-  flex: 1;
+.modules {
   display: flex;
   flex-direction: column;
 }
 
 .moduleWrapper {
   display: flex;
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   align-items: flex-start;
 
   & > * {
-    max-width: 375px;
+    max-width: calc(375px);
     flex: 0 1 auto;
+    transform: scale(var(--build-modules-container-scale-ratio));
+    transform-origin: 0 0;
   }
 }
 
 .moduleWrapper .module {
+  padding: 0.5em;
   border: 1px solid rgba(0, 0, 0, 0.2);
+  width: calc(var(--build-modules-container-scale-ratio) * var(--build-modules-container-width));
+}
+
+.moduleWrapper .menu {
+  transform: none;
+}
+
+.operationPanelWrapper {
+  flex: 1 1 auto;
+  padding: 0 1em;
+}
+
+.operationPanel {
+  & * {
+    box-sizing: border-box;
+  }
+}
+
+.preview {
+  flex: 0 0 auto;
+  min-width: 375px;
+}
+
+.instanceWrapper .instance {
+  width: 375px;
+  height: 667px;
 }

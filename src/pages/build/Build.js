@@ -1,127 +1,154 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import uuid from 'uuid/v1';
-import ReactGridLayout, { WidthProvider } from 'react-grid-layout';
+import forOwn from 'lodash/forOwn';
+import { observer } from 'mobx-react';
 
 import IconMenu from 'material-ui/IconMenu';
+import Menu from 'material-ui/Menu';
+import Paper from 'material-ui/Paper';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
-// import Divider from 'material-ui/Divider';
+import Divider from 'material-ui/Divider';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import Popover from 'material-ui/Popover';
+import TextField from 'material-ui/TextField';
+import Toggle from 'material-ui/Toggle';
 
 // import Preview from '../../components/Preview';
 
+import * as modules from '../../modules';
+import modulesDocs from '../../modules/module-docs.json';
+
+import Props from './model/Props';
+
+import OperationPanel from './OperationPanel';
+
 import s from './Build.css';
 
-import * as modules from '../../modules';
+const getModuleDoc = (function () {
+  const docs = Object.keys(modulesDocs);
 
-const GridLayout = WidthProvider(ReactGridLayout);
+  return (moduleName) => {
+    for (let i = docs.length - 1; i >= 0; i--) {
+      const moduleKey = docs[i];
+
+      if (moduleKey.indexOf(moduleName) !== -1) {
+        return modulesDocs[moduleKey];
+      }
+    }
+
+    return null;
+  };
+}());
+
+const modulesWithPropsSchemaArray = Object.keys(modules).map((moduleKey) => {
+  const moduleWithPropsSchema = {
+    type: modules[moduleKey],
+    propsSchema: getModuleDoc(moduleKey),
+    name: moduleKey,
+  };
+
+  return moduleWithPropsSchema;
+});
+
+const modulesWithPropsSchema = modulesWithPropsSchemaArray.reduce((
+  previousValue,
+  currentValue,
+) => {
+// eslint-disable-next-line no-param-reassign
+  previousValue[currentValue.name] = currentValue;
+
+  return previousValue;
+}, {});
 
 const styles = {
-  remove: {
-    position: 'absolute',
-    right: '2px',
-    top: 0,
-    cursor: 'pointer',
+  paperInput: {
+    marginBottom: '1em',
+    padding: '1em',
   },
 };
 
 @withStyles(s)
+@observer
 export default class Build extends PureComponent {
 
   state = {
-    components: [],
+    instances: [],
+    operatingInstance: null,
   };
 
-  buildComponents = () => {
-    const { components } = this.state;
+  handleClickInstance = clickedInstance => () => {
+    const { operatingInstance } = this.state;
 
-    return components.map(({ component, ...config }) => {
-      const i = config.add ? '+' : config.i;
+    if (operatingInstance !== clickedInstance) {
+      this.setState(() => ({
+        operatingInstance: clickedInstance,
+      }));
+    }
+  };
 
-      const instance = React.createElement(component);
+  buildInstances = () => {
+    const { instances } = this.state;
+
+    return instances.map((instance) => {
+      const { key, name, model } = instance;
+      const { type } = modulesWithPropsSchema[name];
+      const element = React.createElement(observer(type), model.data);
 
       /* eslint-disable jsx-a11y/no-static-element-interactions */
       return (
-        <div key={i} data-grid={config}>
-          {
-            config.add ? (
-              <span
-                className="add text"
-                onClick={this.onAddItem}
-                title="You can add an item by clicking here, too."
-              >Add +</span>
-            ) : (
-              <span className="text">
-                {instance}
-              </span>
-            )
-          }
-          <span
-            className="remove"
-            style={styles.remove}
-            onClick={this.onRemoveItem}
-          >x</span>
+        <div key={key} className={s.instanceWrapper}>
+          <div
+            className={s.instance}
+            onClick={this.handleClickInstance(instance)}
+          >
+            {element}
+          </div>
         </div>
       );
     });
   };
 
-  addComponentConfig = component => () => {
-    this.setState(({ components }) => {
-      const newComponent = {
-        i: uuid(),
-        x: (components.length * 2) % 1,
-        y: Infinity, // puts it at the bottom
-        w: 2,
-        h: 2,
-        margin: [0, 0],
-        component,
+  addInstance = ({ name, propsSchema }) => () => {
+    this.setState(({ instances }) => {
+      const model = new Props(propsSchema);
+      const instance = {
+        key: `${name}-${uuid()}`,
+        name,
+        model,
+        propsSchema,
       };
 
+      // console.log('addInstance, ', model);
+
       return {
-        components: components.concat([newComponent]),
+        instances: instances.concat(instance),
       };
     });
   };
 
-  renderModuleMenu = component => (
-    <IconMenu
-      iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
-      anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
-      targetOrigin={{ horizontal: 'left', vertical: 'top' }}
-    >
-      <MenuItem onTouchTap={this.addComponentConfig(component)} >
-        添加
-      </MenuItem>
-      {/* <Divider />
-        <MenuItem>
-        </MenuItem>
-        <Divider />
-        <MenuItem>
-        </MenuItem>*/}
-
-    </IconMenu>
-  );
-
-
   renderModules = () => {
-    const moduleKeys = Object.keys(modules);
-
-    const modulesDOM = moduleKeys.map((moduleName) => {
-      const module = modules[moduleName];
-
-      const moduleDOM = React.createElement(module, {
-        key: moduleName,
-      });
+    const modulesDOM = modulesWithPropsSchemaArray.map((moduleWithPropsSchema) => {
+      const { type, name } = moduleWithPropsSchema;
+      const moduleDOM = React.createElement(type);
 
       return (
-        <div key={moduleName} className={s.moduleWrapper}>
+        <div key={name} className={s.moduleWrapper}>
           <div className={s.module}>
             {moduleDOM}
           </div>
-          <div>
-            {this.renderModuleMenu(module)}
+          <div className={s.menu}>
+            <IconMenu
+              iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
+              anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
+              targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+            >
+              <MenuItem onTouchTap={this.addInstance(moduleWithPropsSchema)} >
+                添加
+              </MenuItem>
+            </IconMenu>
           </div>
         </div>
       );
@@ -131,26 +158,39 @@ export default class Build extends PureComponent {
   };
 
   render() {
+    const { operatingInstance } = this.state;
+
     return (
       <div className={s.root}>
-        <div className={s.operationPanel}>
-          {this.renderModules()}
+        <div className={s.modulesWrapper}>
+          <h1>组件库</h1>
+
+          <div className={s.modules}>
+            {this.renderModules()}
+          </div>
+        </div>
+
+        <div className={s.operationPanelWrapper}>
+          <h1>操作面板</h1>
+
+          <div className={s.operationPanel}>
+            {
+              operatingInstance && (
+                <OperationPanel
+                  {...operatingInstance}
+                />
+              )
+            }
+          </div>
         </div>
 
         <div className={s.preview}>
-          <GridLayout
-            cols={1}
-            // rowHeight={100}
-          >
-            {this.buildComponents()}
-          </GridLayout>
-        </div>
+          <h1>布局</h1>
 
-        {/*
-        <Preview className={s.preview}>
-          Home
-        </Preview>
-        */}
+          <div>
+            {this.buildInstances()}
+          </div>
+        </div>
       </div>
     );
   }

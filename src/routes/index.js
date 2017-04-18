@@ -3,6 +3,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
+import DevTool from 'mobx-react-devtools';
 
 import Layout from '../components/Layout';
 
@@ -17,6 +18,12 @@ const routes = (
       <Route path="/components" component={Components} />
       <Route path="/build" component={Build} />
     </Switch>
+
+    {
+      process.env.NODE_ENV !== 'production' && (
+        <DevTool />
+      )
+    }
   </Layout>
 );
 

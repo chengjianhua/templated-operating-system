@@ -38,3 +38,6 @@ jspm_packages
 
 # Editors
 .vscode
+
+# System
+.DS_Store

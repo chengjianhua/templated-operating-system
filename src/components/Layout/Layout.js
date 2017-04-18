@@ -26,7 +26,7 @@ export default class Layout extends Component {
   };
 
   state = {
-    drawerOpen: true,
+    drawerOpen: false,
   };
 
   handleAppBarLeftIconTouch = () => {

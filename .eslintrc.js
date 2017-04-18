@@ -11,12 +11,14 @@ module.exports = {
     __DEV__: true
   },
   env: {
-    browser: true
+    browser: true,
+    mocha: true
   },
   rules: {
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'react/jsx-filename-extension': 'off',
-    'react/prefer-stateless-function': 'off'
+    'react/prefer-stateless-function': 'off',
+    'no-plusplus': 'off',
   }
 };

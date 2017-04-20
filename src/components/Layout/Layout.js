@@ -1,84 +1,106 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import AppBar from 'material-ui/AppBar';
-import Paper from 'material-ui/Paper';
-import MenuItem from 'material-ui/MenuItem';
-import cx from 'classnames';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import { Link, withRouter } from 'react-router-dom';
+import { Layout, Menu, Breadcrumb, Icon } from 'antd';
+import { Link } from 'react-router-dom';
+import DevTool from 'mobx-react-devtools';
 
 import s from './Layout.css';
 
-const styles = {
-  sidebar: {
-    flex: 1,
-  },
-};
+const { Header, Content, Footer, Sider } = Layout;
 
-@withStyles(s)
-@withRouter
-export default class Layout extends Component {
+const { Item: MenuItem } = Menu;
+
+const { Item: BreadcrumbItem } = Breadcrumb;
+
+export default class extends Component {
   static propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.node,
-      PropTypes.arrayOf(PropTypes.node),
-    ]).isRequired,
+    children: PropTypes.node.isRequired,
   };
 
   state = {
-    drawerOpen: false,
+    collapsed: false,
   };
 
-  handleAppBarLeftIconTouch = () => {
-    this.setState(({ drawerOpen }) => ({
-      drawerOpen: !drawerOpen,
+  toggle = () => {
+    this.setState(({ collapsed }) => ({
+      collapsed: !collapsed,
     }));
-  };
+  }
 
   render() {
-    const { drawerOpen } = this.state;
-
-    const sidebarClass = cx(
-      s.sidebar, {
-        [s.close]: !drawerOpen,
-      },
-    );
+    const { collapsed } = this.state;
 
     return (
-      <div className={s.root}>
-        <header>
-          <AppBar
-            title="运营模板系统"
-            onLeftIconButtonTouchTap={this.handleAppBarLeftIconTouch}
-          />
-        </header>
+      <Layout className={s.root}>
+        <Sider
+          collapsible
+          breakpoint="lg"
+          trigger={null}
+          collapsed={collapsed}
+        >
+          <div className={s.logo} />
 
-        <section className={s.section}>
-
-          <main className={s.main}>
-            {this.props.children}
-          </main>
-
-          <aside className={sidebarClass}>
-            <Paper zDepth={1} style={styles.sidebar}>
+          <Menu
+            theme="dark"
+            mode="inline"
+            defaultSelectedKeys={['1']}
+            style={{ lineHeight: '64px' }}
+          >
+            <MenuItem key="1">
               <Link to="/">
-                <MenuItem>Dashboard</MenuItem>
+                <Icon type="appstore-o" />
+                <span className="nav-text">Dashboard</span>
               </Link>
+            </MenuItem>
+
+            <MenuItem key="2">
               <Link to="/components">
-                <MenuItem>组件库</MenuItem>
+                <Icon type="folder" />
+                <span className="nav-text">组件库</span>
               </Link>
+            </MenuItem>
+
+            <MenuItem key="3">
               <Link to="/build">
-                <MenuItem>制作</MenuItem>
+                <Icon type="layout" />
+                <span className="nav-text">工作台</span>
               </Link>
-            </Paper>
-          </aside>
-        </section>
+            </MenuItem>
+          </Menu>
+        </Sider>
 
-        <footer>
-          {''}
-        </footer>
+        <Layout>
+          <Header style={{ background: '#fff', padding: 0 }}>
+            <Icon
+              className={s.trigger}
+              type={collapsed ? 'menu-unfold' : 'menu-fold'}
+              onClick={this.toggle}
+            />
+          </Header>
 
-      </div>
+          <Content style={{ margin: '24px 16px', padding: 24, background: '#fff' }}>
+            {/*<Breadcrumb style={{ margin: '12px 0' }}>
+              <BreadcrumbItem>Home</BreadcrumbItem>
+              <BreadcrumbItem>List</BreadcrumbItem>
+              <BreadcrumbItem>App</BreadcrumbItem>
+            </Breadcrumb>*/}
+
+            <div>
+              {React.Children.only(this.props.children)}
+            </div>
+          </Content>
+
+          <Footer style={{ textAlign: 'center' }}>
+              运营活动模板化系统 ©2016 Created by Liulishuo FE
+          </Footer>
+
+          {
+            process.env.NODE_ENV !== 'production' && (
+              <DevTool />
+            )
+          }
+        </Layout>
+      </Layout>
     );
   }
 }

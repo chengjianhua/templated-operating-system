@@ -11,6 +11,8 @@ import path from 'path';
 import webpack from 'webpack';
 import AssetsPlugin from 'assets-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
+
 import pkg from '../package.json';
 
 const isDebug = !process.argv.includes('--release');
@@ -21,6 +23,53 @@ const isAnalyze = process.argv.includes('--analyze') || process.argv.includes('-
 // Common configuration chunk to be used for both
 // client-side (client.js) and server-side (server.js) bundles
 // -----------------------------------------------------------------------------
+
+const commonCssLoader = [
+  {
+    loader: 'css-loader',
+    options: {
+      // CSS Loader https://github.com/webpack/css-loader
+      importLoaders: 1,
+      sourceMap: isDebug,
+      // CSS Modules https://github.com/css-modules/css-modules
+      modules: true,
+      localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
+      // CSS Nano http://cssnano.co/options/
+      minimize: !isDebug,
+      discardComments: { removeAll: true },
+    },
+  },
+  {
+    loader: 'postcss-loader',
+    options: {
+      config: './tools/postcss.config.js',
+      // sourceMap: 'inline',
+    },
+  },
+];
+
+const antdCssLoader = [
+  // {
+  //   loader: 'css-loader',
+  //   options: {
+  //     // CSS Loader https://github.com/webpack/css-loader
+  //     importLoaders: 1,
+  //     sourceMap: isDebug,
+  //     // CSS Nano http://cssnano.co/options/
+  //     minimize: !isDebug,
+  //     discardComments: { removeAll: true },
+  //   },
+  // },
+  // {
+  //   loader: 'postcss-loader',
+  //   options: {
+  //     config: './tools/postcss.config.js',
+  //   },
+  // },
+  {
+    loader: 'css-loader',
+  },
+];
 
 const config = {
   context: path.resolve(__dirname, '..'),
@@ -77,40 +126,13 @@ const config = {
             ['transform-decorators-legacy'],
 
             ['transform-react-display-name'],
+
+            ['import', {
+              libraryName: 'antd',
+              style: 'css',
+            }],
           ],
         },
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: 'isomorphic-style-loader',
-          },
-          // {
-          //   loader: 'style-loader',
-          // },
-          {
-            loader: 'css-loader',
-            options: {
-              // CSS Loader https://github.com/webpack/css-loader
-              importLoaders: 1,
-              sourceMap: isDebug,
-              // CSS Modules https://github.com/css-modules/css-modules
-              modules: true,
-              localIdentName: isDebug ? '[name]-[local]-[hash:base64:5]' : '[hash:base64:5]',
-              // CSS Nano http://cssnano.co/options/
-              minimize: !isDebug,
-              discardComments: { removeAll: true },
-            },
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              config: './tools/postcss.config.js',
-              // sourceMap: 'inline',
-            },
-          },
-        ],
       },
       {
         test: /\.md$/,
@@ -176,7 +198,43 @@ const clientConfig = {
     chunkFilename: isDebug ? '[name].chunk.js' : '[name].[chunkhash:8].chunk.js',
   },
 
+  module: {
+    ...config.module,
+
+    rules: [
+      ...config.module.rules,
+
+      {
+        test: /\.css$/,
+        exclude: /antd.*css$/,
+        use: isDebug ? [
+          {
+            loader: 'style-loader',
+          },
+          ...commonCssLoader,
+        ] :
+        ExtractTextPlugin.extract({
+          use: [
+            ...commonCssLoader,
+          ],
+        }),
+      },
+
+      {
+        test: /antd.*css$/,
+        use: ExtractTextPlugin.extract({
+          use: [
+            ...antdCssLoader,
+          ],
+        }),
+      },
+
+    ],
+  },
+
   plugins: [
+    new ExtractTextPlugin('styles.css'),
+
     // Define free variables
     // https://webpack.github.io/docs/list-of-plugins.html#defineplugin
     new webpack.DefinePlugin({
@@ -197,7 +255,13 @@ const clientConfig = {
     // http://webpack.github.io/docs/list-of-plugins.html#commonschunkplugin
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      minChunks: module => /node_modules/.test(module.resource),
+      minChunks: (module) => {
+        if (/antd/.test(module.resource)) {
+          return false;
+        }
+
+        return /node_modules/.test(module.resource);
+      },
     }),
 
     ...isDebug ? [] : [
@@ -278,7 +342,28 @@ const serverConfig = {
           debug: false,
         }])),
       },
-    })),
+    }))
+    .concat([
+      {
+        test: /\.css$/,
+        exclude: /antd.*css$/,
+        use: [
+          {
+            loader: 'node-style-loader',
+          },
+          ...commonCssLoader,
+        ],
+      },
+      {
+        test: /antd.*css$/,
+        use: [
+          {
+            loader: 'node-style-loader',
+          },
+          ...antdCssLoader,
+        ],
+      },
+    ]),
   },
 
   externals: [
@@ -286,6 +371,8 @@ const serverConfig = {
     (context, request, callback) => {
       const isExternal =
         request.match(/^[@a-z][a-z/.\-0-9]*$/i) &&
+        // antd use babel-plugin-import to load js and css modularly
+        !request.match(/antd/) &&
         !request.match(/\.(css|less|scss|sss)$/i);
       callback(null, Boolean(isExternal));
     },

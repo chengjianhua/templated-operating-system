@@ -1,0 +1,17 @@
+.root {
+  display: inline-block;
+  text-align: center;
+  background-color: #4FCB19;
+  color: white;
+  border: none;
+  font-size: 24px;
+
+  &:not(.fullWidth) {
+    padding: 8px 16px;
+  }
+}
+
+.fullWidth {
+  line-height: 50px;
+  width: 100%;
+}

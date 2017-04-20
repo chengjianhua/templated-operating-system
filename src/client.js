@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import serverStyleCleanup from 'node-style-loader/clientCleanup';
 import FastClick from 'fastclick';
 // import queryString from 'query-string';
 // import { createPath } from 'history/PathUtils';
@@ -15,23 +16,17 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 // import { updateMeta } from './core/DOMUtils';
 
-import App from './components/App';
-
 injectTapEventPlugin();
 
-// import routes from './routes';
+// const stylesheets = document.querySelectorAll('link.stylesheet');
 
-// Global (context) variables that can be easily accessed from any React component
-// https://facebook.github.io/react/docs/context.html
-const context = {
-  // Enables critical path CSS rendering
-  // https://github.com/kriasoft/isomorphic-style-loader
-  insertCss: (...styles) => {
-    // eslint-disable-next-line no-underscore-dangle
-    const removeCss = styles.map(x => x._insertCss());
-    return () => { removeCss.forEach(f => f()); };
-  },
-};
+// stylesheets.forEach((stylesheet) => {
+//   console.log(stylesheet);
+// });
+
+setTimeout(() => {
+  serverStyleCleanup();
+}, 3000);
 
 // Make taps on links and buttons work fast on mobiles
 FastClick.attach(document.body);
@@ -39,23 +34,24 @@ FastClick.attach(document.body);
 const container = document.getElementById('app');
 const muiTheme = getMuiTheme({ userAgent: navigator.userAgent });
 
-function render(routesRender) {
+function render(App) {
   // eslint-disable-next-line
   return ReactDOM.render(
     <MuiThemeProvider muiTheme={muiTheme}>
       <Router basename="/app">
-        <App context={context}>
-          {routesRender}
-        </App>
+        <App />
       </Router>
     </MuiThemeProvider>,
     container,
   );
 }
 
-let routes = require('./routes').default;
+let App = require('./components/App').default;
 // eslint-disable-next-line
-let appInstance = render(routes);
+let appInstance = render(App);
+
+// remove the style tag which [className="server-style-loader-element"]
+// serverStyleCleanup();
 
 if (__DEV__) {
   window.addEventListener('error', (event) => {
@@ -67,14 +63,14 @@ if (__DEV__) {
 
 // Enable Hot Module Replacement (HMR)
 if (module.hot) {
-  module.hot.accept('./routes', () => {
-    routes = require('./routes').default; // eslint-disable-line global-require
+  module.hot.accept('./components/App', () => {
+    App = require('./components/App').default; // eslint-disable-line global-require
 
     if (appInstance) {
       try {
         // Force-update the whole tree, including components that refuse to update
         deepForceUpdate(appInstance);
-        appInstance = render(routes);
+        appInstance = render(App);
       } catch (error) {
         appInstance = null;
         document.title = `Hot Update Error: ${error.message}`;

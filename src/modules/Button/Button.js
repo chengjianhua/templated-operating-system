@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import FlatButton from 'material-ui/FlatButton';
-import { observer } from 'mobx-react';
-
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
+import Tappable from 'react-tappable';
+import cx from 'classnames';
 
 import s from './Button.css';
 
-@observer
-@withStyles(s)
 export default class Button extends Component {
   static displayName = 'Button';
 
@@ -16,23 +12,28 @@ export default class Button extends Component {
   static propTypes = {
     "label": PropTypes.node,
     "fullWidth": PropTypes.bool,
-    ...FlatButton.propTypes,
   };
 
   static defaultProps = {
     "label": "按钮",
-    "fullWidth": true,
+    "fullWidth": true
   };
 
   render() {
-    const { children, ...props } = this.props;
+    const { label, fullWidth, ...props } = this.props;
+    const className = cx(
+      s.root,
+      fullWidth && s.fullWidth,
+    );
 
     return (
-      <FlatButton
+      <Tappable
+        component="button"
+        className={className}
         {...props}
       >
-        {children}
-      </FlatButton>
+        {label}
+      </Tappable>
     );
   }
 }

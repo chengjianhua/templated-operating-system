@@ -4,7 +4,7 @@ import ReactDOM, { findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 
-import s from './Preview.css';
+// import s from './Preview.css';
 
 const styles = {
   root: {
@@ -13,7 +13,7 @@ const styles = {
   },
 };
 
-@withStyles(s)
+// @withStyles(s)
 export default class MyComponent extends Component {
   static propTypes = {
     children: PropTypes.node,

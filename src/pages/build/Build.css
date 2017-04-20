@@ -8,55 +8,32 @@
   justify-content: space-between;
 }
 
-.modulesWrapper {
+.controls {
   flex: 0 1 auto;
-}
-
-.modules {
-  display: flex;
-  flex-direction: column;
-}
-
-.moduleWrapper {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: flex-start;
-
-  & > * {
-    max-width: calc(375px);
-    flex: 0 1 auto;
-    transform: scale(var(--build-modules-container-scale-ratio));
-    transform-origin: 0 0;
-  }
-}
-
-.moduleWrapper .module {
-  padding: 0.5em;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  width: calc(var(--build-modules-container-scale-ratio) * var(--build-modules-container-width));
-}
-
-.moduleWrapper .menu {
-  transform: none;
-}
-
-.operationPanelWrapper {
-  flex: 1 1 auto;
-  padding: 0 1em;
-}
-
-.operationPanel {
-  & * {
-    box-sizing: border-box;
-  }
-}
-
-.preview {
-  flex: 0 0 auto;
-  min-width: 375px;
-}
-
-.instanceWrapper .instance {
   width: 375px;
+
+  :global .ant-tabs-nav {
+    width: 100%;
+
+    .ant-tabs-tab {
+      width: 33.33333333%;
+      text-align: center;
+      margin-right: 0;
+      padding: 8px 0;
+    }
+  }
+}
+
+.instances {
+  flex: 0 0 auto;
+  width: 375px;
+  box-sizing: content-box;
   height: 667px;
+  overflow: scroll;
+  -webkit-overflow-scrolling: smooth;
+  border: 1px solid black;
+
+  .instance {
+
+  }
 }

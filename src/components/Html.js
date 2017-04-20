@@ -1,12 +1,3 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 import React, { PropTypes } from 'react';
 import { analytics } from '../config';
 
@@ -20,17 +11,19 @@ class Html extends React.Component {
     }).isRequired),
     scripts: PropTypes.arrayOf(PropTypes.string.isRequired),
     children: PropTypes.string.isRequired,
+    stylesheets: PropTypes.arrayOf(PropTypes.string).isRequired,
   };
 
   static defaultProps = {
     styles: [],
     scripts: [],
+    stylesheets: [],
   };
 
   render() {
-    const { title, description, styles, scripts, children } = this.props;
+    const { title, description, styles, scripts, children, stylesheets } = this.props;
     return (
-      <html className="no-js" lang="en">
+      <html className="no-js" lang="zh-CN">
         <head>
           <meta charSet="utf-8" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
@@ -38,10 +31,21 @@ class Html extends React.Component {
           <meta name="description" content={description} />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+          {
+            stylesheets.map(stylesheet => (
+              <link className="stylesheet" rel="stylesheet" type="text/css" href={stylesheet} />
+            ))
+          }
+          {/* <script dangerouslySetInnerHTML={{ __html: `
+            document.querySelector('link')
+          ` }}
+          />*/}
+
           {styles.map(style =>
             <style
               key={style.id}
               id={style.id}
+              className="server-style-loader-element"
               // eslint-disable-next-line react/no-danger
               dangerouslySetInnerHTML={{ __html: style.cssText }}
             />,

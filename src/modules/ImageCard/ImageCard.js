@@ -40,10 +40,6 @@ ImageCard.propTypes = {
     avatar: PropTypes.any,
     nick: PropTypes.string,
     signature: PropTypes.string,
-    test: PropTypes.shape({
-      a: PropTypes.string,
-      b: PropTypes.string,
-    }),
   }),
 };
 

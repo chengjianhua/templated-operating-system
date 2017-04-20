@@ -9,17 +9,19 @@ import ReactDOM from 'react-dom/server';
 import { StaticRouter as Router } from 'react-router-dom';
 import PrettyError from 'pretty-error';
 
+import { collectInitial } from 'node-style-loader/collect';
+
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import App from './components/App';
 import Html from './components/Html';
-import { ErrorPageWithoutStyle } from './pages/error/ErrorPage';
-import errorPageStyle from './pages/error/ErrorPage.css';
+import ErrorPage from './pages/error/ErrorPage';
 // import passport from './core/passport';
-import routes from './routes';
+// import routes from './routes';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import { port, auth } from './config';
+
 
 const app = express();
 
@@ -62,23 +64,15 @@ if (__DEV__) {
 // -----------------------------------------------------------------------------
 app.get('*', async (req, res, next) => {
   try {
-    const css = new Set();
+    const initialStyleTag = collectInitial();
+
+    const initialCss = initialStyleTag.replace(/<\/?style.*>/, '');
 
     const routerContext = {};
 
-    // Global (context) variables that can be easily accessed from any React component
-    // https://facebook.github.io/react/docs/context.html
-    const appContext = {
-      // Enables critical path CSS rendering
-      // https://github.com/kriasoft/isomorphic-style-loader
-      insertCss: (...styles) => {
-        // eslint-disable-next-line no-underscore-dangle
-        styles.forEach(style => css.add(style._getCss()));
-      },
-    };
-
     const userAgent = req.headers['user-agent'];
     const muiTheme = getMuiTheme({ userAgent });
+
     global.navigator = {
       userAgent,
     };
@@ -86,27 +80,28 @@ app.get('*', async (req, res, next) => {
     const data = {
       title: 'html',
       description: 'html',
+      children: ReactDOM.renderToString(
+        <MuiThemeProvider muiTheme={muiTheme}>
+          <Router
+            basename="/app"
+            location={req.url}
+            context={routerContext}
+          >
+            <App />
+          </Router>
+        </MuiThemeProvider>,
+      ),
+      styles: [
+        { id: 'css', cssText: initialCss },
+      ],
+      stylesheets: [
+        assets.client.css,
+      ],
+      scripts: [
+        assets.vendor.js,
+        assets.client.js,
+      ],
     };
-    data.children = ReactDOM.renderToString(
-      <MuiThemeProvider muiTheme={muiTheme}>
-        <Router
-          basename="/app"
-          location={req.url}
-          context={routerContext}
-        >
-          <App context={appContext}>
-            {routes}
-          </App>
-        </Router>
-      </MuiThemeProvider>,
-    );
-    data.styles = [
-      { id: 'css', cssText: [...css].join('') },
-    ];
-    data.scripts = [
-      assets.vendor.js,
-      assets.client.js,
-    ];
 
     if (routerContext.url) {
       res.writeHead(301, {
@@ -132,13 +127,18 @@ pe.skipPackage('express');
 
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.log(pe.render(err)); // eslint-disable-line no-console
+
+  const initialStyleTag = collectInitial();
+
+  const initialCss = initialStyleTag.replace(/<\/?style.*>/, '');
+
   const html = ReactDOM.renderToStaticMarkup(
     <Html
       title="Internal Server Error"
       description={err.message}
-      styles={[{ id: 'css', cssText: errorPageStyle._getCss() }]} // eslint-disable-line no-underscore-dangle
+      styles={[{ id: 'css', cssText: initialCss }]} // eslint-disable-line no-underscore-dangle
     >
-      {ReactDOM.renderToString(<ErrorPageWithoutStyle error={err} />)}
+      {ReactDOM.renderToString(<ErrorPage error={err} />)}
     </Html>,
   );
   res.status(err.status || 500);

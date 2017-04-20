@@ -2,7 +2,7 @@ module.exports = {
   parser: 'babel-eslint',
   extends: [
     'airbnb',
-    'plugin:css-modules/recommended'
+    // 'plugin:css-modules/recommended'
   ],
   plugins: [
     'css-modules'

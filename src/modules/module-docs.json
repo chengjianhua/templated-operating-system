@@ -26,10 +26,7 @@
           "computed": false
         }
       }
-    },
-    "composes": [
-      "material-ui/FlatButton"
-    ]
+    }
   },
   "ImageCard/ImageCard.js": {
     "description": "",
@@ -50,20 +47,6 @@
             },
             "signature": {
               "name": "string",
-              "required": false
-            },
-            "test": {
-              "name": "shape",
-              "value": {
-                "a": {
-                  "name": "string",
-                  "required": false
-                },
-                "b": {
-                  "name": "string",
-                  "required": false
-                }
-              },
               "required": false
             }
           }

@@ -15,10 +15,14 @@ module.exports = {
     mocha: true
   },
   rules: {
+    'no-plusplus': 'off',
+
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
+
     'react/jsx-filename-extension': 'off',
     'react/prefer-stateless-function': 'off',
-    'no-plusplus': 'off',
+    'react/forbid-prop-types': 'off',
+    'react/sort-comp': 'off',
   }
 };

@@ -14,14 +14,16 @@ import { collectInitial } from 'node-style-loader/collect';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
+import './core/ssrPolyfill';
+
 import App from './components/App';
 import Html from './components/Html';
 import ErrorPage from './pages/error/ErrorPage';
+
 // import passport from './core/passport';
 // import routes from './routes';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import { port, auth } from './config';
-
 
 const app = express();
 

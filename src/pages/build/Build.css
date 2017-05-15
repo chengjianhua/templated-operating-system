@@ -30,10 +30,47 @@
   box-sizing: content-box;
   height: 667px;
   overflow: scroll;
-  -webkit-overflow-scrolling: smooth;
-  border: 1px solid black;
+  -webkit-overflow-scrolling: touch;
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+}
 
-  .instance {
+.sortableItemWrapper {
+  position: relative;
+  border: 1px dashed gray;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  /*background-color: white;*/
+  /*background-color: transparent;*/
 
+  .sortableItem {
+
+  }
+
+  &:hover {
+    & .sortableItemOperations {
+      transform: translateX(0);
+    }
+  }
+
+  .sortableItemOperations {
+    position: absolute;
+    padding: 8px;
+    right: 0;
+    top: 0;
+    transform: translateX(100%);
+    background: #fff;
+    box-shadow: 8px 4px 5px rgba(0, 0, 0, 0.2);
+    /*background-color: transparent;*/
+    transition: 0.3s all ease;
+
+    .icon {
+      font-size: 24px;
+      vertical-align: middle;
+      cursor: pointer;
+
+      &:global(.anticon-close-circle-o) {
+        color: red;
+      }
+    }
   }
 }

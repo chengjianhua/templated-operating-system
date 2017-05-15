@@ -33,7 +33,7 @@ class Html extends React.Component {
           <link rel="apple-touch-icon" href="apple-touch-icon.png" />
           {
             stylesheets.map(stylesheet => (
-              <link className="stylesheet" rel="stylesheet" type="text/css" href={stylesheet} />
+              <link key={stylesheet} className="stylesheet" rel="stylesheet" type="text/css" href={stylesheet} />
             ))
           }
           {/* <script dangerouslySetInnerHTML={{ __html: `

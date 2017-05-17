@@ -1,23 +1,32 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
-
 import path from 'path';
+import fs from 'fs';
 import webpack from 'webpack';
 import AssetsPlugin from 'assets-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import isArray from 'lodash/isArray';
 
 import pkg from '../package.json';
 
 const isDebug = !process.argv.includes('--release');
 const isVerbose = process.argv.includes('--verbose');
 const isAnalyze = process.argv.includes('--analyze') || process.argv.includes('--analyse');
+
+const babelrcSource = fs.readFileSync(path.resolve(__dirname, '../.babelrc'), 'utf8');
+
+const babelConfig = JSON.parse(babelrcSource);
+
+const moduleResolver = babelConfig.plugins.find((plugin) => {
+  if (isArray(plugin)) {
+    return plugin[0] === 'module-resolver';
+  }
+
+  return false;
+});
+
+moduleResolver[1].root = [
+  path.resolve(__dirname, '../src'),
+];
 
 //
 // Common configuration chunk to be used for both
@@ -131,6 +140,8 @@ const config = {
               libraryName: 'antd',
               style: 'css',
             }],
+
+            moduleResolver,
           ],
         },
       },
@@ -316,7 +327,7 @@ const serverConfig = {
   target: 'node',
 
   entry: {
-    server: ['babel-polyfill', './src/server.js'],
+    server: ['babel-polyfill', './src/server/server.js'],
   },
 
   output: {
@@ -369,11 +380,30 @@ const serverConfig = {
   externals: [
     /^\.\/assets\.json$/,
     (context, request, callback) => {
+      const moduleAlias = Object.keys(moduleResolver[1].alias).map((key) => {
+        let alias;
+
+        if (key.startsWith('^')) {
+          alias = key;
+        } else {
+          alias = `^${key}`;
+        }
+
+        return new RegExp(alias);
+      });
+
+      const excludePath = [
+        // antd start: use babel-plugin-import to load js and css modularly
+        /^antd.*style/i,
+        ...moduleAlias,
+      ];
+
+      const isExcluded = excludePath.some(reg => request.match(reg));
+
       const isExternal =
         request.match(/^[@a-z][a-z/.\-0-9]*$/i) &&
-        // antd use babel-plugin-import to load js and css modularly
-        !request.match(/antd/) &&
-        !request.match(/\.(css|less|scss|sss)$/i);
+        !isExcluded;
+
       callback(null, Boolean(isExternal));
     },
   ],

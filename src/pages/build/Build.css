@@ -3,9 +3,18 @@
   --build-modules-container-scale-ratio: 0.8;
 }
 
-.root {
+.operationsRow {
+  > * {
+    &:not(:last-child) {
+      margin-right: 1em;
+    }
+  }
+}
+
+.main {
   display: flex;
   justify-content: space-between;
+  margin-top: 1em;
 }
 
 .controls {

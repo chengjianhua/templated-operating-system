@@ -12,7 +12,17 @@
     "react"
   ],
   "plugins": [
-    "transform-decorators-legacy"
+    "transform-decorators-legacy",
+    ["module-resolver", {
+      "root": ["./src"],
+      "alias": {
+        "components": "components",
+        "core": "core",
+        "pages": "pages",
+        "server": "server",
+        "config": "config"
+      }
+    }]
   ],
   "env": {
     "test": {

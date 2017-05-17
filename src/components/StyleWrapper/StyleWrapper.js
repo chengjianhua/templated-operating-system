@@ -9,9 +9,7 @@ import Style from './StyleModel';
 /* eslint-disable comma-dangle, quotes, quote-props */
 
 /* eslint react/prop-types: ['error', { ignore: ['stylesStore'] }] */
-@inject(({ styles: stylesStore }) => ({
-  stylesStore,
-}))
+@inject('stylesStore')
 @observer
 export default class StyleWrapper extends Component {
   static propTypes = {

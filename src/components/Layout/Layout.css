@@ -53,3 +53,18 @@ a {
   border-radius: 6px;
   margin: 16px;
 }
+
+.header {
+  background-color: #fff;
+  padding: 0;
+}
+
+.content {
+  margin-top: 24px;
+  padding: 24px;
+  background-color: #fff;
+}
+
+.footer {
+  text-align: center;
+}

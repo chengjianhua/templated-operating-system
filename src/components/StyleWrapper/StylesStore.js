@@ -1,4 +1,5 @@
 // import { observable } from 'mobx';
+
 import StyleModel from './StyleModel';
 
 export default class StylesStore {
@@ -20,5 +21,18 @@ export default class StylesStore {
 
   removeStyle(id) {
     delete this.styles[id];
+  }
+
+  getStyles() {
+    return Object.keys(this.styles).map((key) => {
+      const style = this.styles[key].toData();
+
+      return [key, style];
+    })
+    .reduce((acc, [key, style]) => {
+      acc[key] = style;
+
+      return acc;
+    }, {});
   }
 }

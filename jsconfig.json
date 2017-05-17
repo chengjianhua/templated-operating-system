@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "baseUrl": "./src",
+    "paths": {
+      "server": [ "server/*" ],
+      "components": [ "components/*" ],
+      "pages": [ "pages/*" ],
+      "core": [ "core/*" ],
+      "config": [ "config/*" ]
+    },
+    "experimentalDecorators": true
+  }
+}

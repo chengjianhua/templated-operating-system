@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Layout, Menu, Breadcrumb, Icon } from 'antd';
 import { Link } from 'react-router-dom';
 import DevTool from 'mobx-react-devtools';
+import { Layout, Menu, Breadcrumb, Icon } from 'antd';
 
 import s from './Layout.css';
 
@@ -70,7 +70,7 @@ export default class extends Component {
         </Sider>
 
         <Layout>
-          <Header style={{ background: '#fff', padding: 0 }}>
+          <Header className={s.header}>
             <Icon
               className={s.trigger}
               type={collapsed ? 'menu-unfold' : 'menu-fold'}
@@ -78,19 +78,21 @@ export default class extends Component {
             />
           </Header>
 
-          <Content style={{ margin: '24px 16px', padding: 24, background: '#fff' }}>
-            {/*<Breadcrumb style={{ margin: '12px 0' }}>
+          <Content className={s.content}>
+            {/*
+            <Breadcrumb style={{ margin: '12px 0' }}>
               <BreadcrumbItem>Home</BreadcrumbItem>
               <BreadcrumbItem>List</BreadcrumbItem>
               <BreadcrumbItem>App</BreadcrumbItem>
-            </Breadcrumb>*/}
+            </Breadcrumb>
+            */}
 
             <div>
               {React.Children.only(this.props.children)}
             </div>
           </Content>
 
-          <Footer style={{ textAlign: 'center' }}>
+          <Footer className={s.footer}>
               运营活动模板化系统 ©2016 Created by Liulishuo FE
           </Footer>
 

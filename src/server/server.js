@@ -14,16 +14,19 @@ import { collectInitial } from 'node-style-loader/collect';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-import './core/ssrPolyfill';
+import { port, auth } from 'config';
+import 'core/ssrPolyfill';
+import App from 'components/App';
+import Html from 'components/Html';
+import ErrorPage from 'pages/error/ErrorPage';
 
-import App from './components/App';
-import Html from './components/Html';
-import ErrorPage from './pages/error/ErrorPage';
+import apiRouter from 'server/api';
+
+import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 
 // import passport from './core/passport';
 // import routes from './routes';
-import assets from './assets.json'; // eslint-disable-line import/no-unresolved
-import { port, auth } from './config';
+// import { port, auth } from '../config';
 
 const app = express();
 
@@ -59,7 +62,7 @@ if (__DEV__) {
 //
 // Register API middleware
 // -----------------------------------------------------------------------------
-// app.use('/api', );
+app.use('/api', apiRouter);
 
 //
 // Register server-side rendering middleware
@@ -75,9 +78,7 @@ app.get('*', async (req, res, next) => {
     const userAgent = req.headers['user-agent'];
     const muiTheme = getMuiTheme({ userAgent });
 
-    global.navigator = {
-      userAgent,
-    };
+    global.navigator.userAgent = userAgent;
 
     const data = {
       title: 'html',

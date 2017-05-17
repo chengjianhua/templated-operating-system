@@ -1,5 +1,4 @@
 import { observable, action, computed, extendObservable } from 'mobx';
-import pick from 'lodash/pick';
 import set from 'lodash/set';
 import get from 'lodash/get';
 import kebabCase from 'lodash/kebabCase';
@@ -48,7 +47,7 @@ export default class StyleModel {
       .map((key) => {
         const keyKebabCase = kebabCase(key);
         const cssValue = cssStyleDeclaration.getPropertyValue(keyKebabCase);
-        console.log(key, keyKebabCase, cssValue);
+
         return [key, cssValue];
       })
       .reduce((acc, [key, cssValue]) => {
@@ -72,5 +71,11 @@ export default class StyleModel {
 
   get(path) {
     return get(this, path);
+  }
+
+  toData() {
+    const { center, id, fixed, style } = this;
+
+    return { id, center, fixed, style };
   }
 }

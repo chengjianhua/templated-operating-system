@@ -4,11 +4,16 @@ import { Provider } from 'mobx-react';
 import { Route } from 'react-router-dom';
 
 import Build from './Build';
+import BuildStore from './model/Build';
 
 import StylesStore from '../../components/StyleWrapper/StylesStore';
 
+const stylesStore = new StylesStore();
+const buildStore = new BuildStore(stylesStore);
+
 const stores = {
-  styles: new StylesStore(),
+  stylesStore,
+  buildStore,
 };
 
 function BuildRoot() {
@@ -19,8 +24,8 @@ function BuildRoot() {
   );
 }
 
-BuildRoot.propTypes = {
+// BuildRoot.propTypes = {
   // children: PropTypes.element.isRequired,
-};
+// };
 
 export default BuildRoot;

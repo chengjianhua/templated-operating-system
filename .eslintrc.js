@@ -14,6 +14,11 @@ module.exports = {
     browser: true,
     mocha: true
   },
+   settings: {
+    'import/resolver': {
+      'babel-module': {}
+    }
+  },
   rules: {
     'no-plusplus': 'off',
 

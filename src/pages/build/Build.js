@@ -1,12 +1,9 @@
 import React, { PureComponent } from 'react';
-// import { renderToStaticMarkup } from 'react-dom/server';
-import { observable, action, autorun, reaction } from 'mobx';
+import { action, reaction } from 'mobx';
 // import PropTypes from 'prop-types';
 import uuid from 'uuid/v1';
-// import forOwn from 'lodash/forOwn';
-import { observer } from 'mobx-react';
-import { Row, Col, Tabs, Icon, message } from 'antd';
-// import rasterizeHTML from 'rasterizehtml/dist/rasterizeHTML.allinone';
+import { observer, inject } from 'mobx-react';
+import { Row, Col, Tabs, Icon, message, Button } from 'antd';
 
 import SortableList from '../../components/SortableList';
 
@@ -31,54 +28,30 @@ const componentCount = (name) => {
   return countMap[name];
 };
 
+/* eslint react/prop-types: ['error', { ignore: ['buildStore'] }] */
+@inject('buildStore')
 @observer
 export default class Build extends PureComponent {
-  @observable instances = [];
-  @observable operatingInstance = null;
-  @observable activeKey = 'libraries';
+  operatingInstanceDisposer;
 
-  state = {
-    instances: [],
-    operatingInstance: null,
-    activeKey: 'edit',
+  handleTabClick = (activeKey) => {
+    this.props.buildStore.setActiveKey(activeKey);
   };
 
-  constructor(...args) {
-    super(...args);
-
-    reaction(
-      () => this.instances.length,
-      (instancesLength) => {
-        const { operatingInstance, instances } = this;
-        const isExist = instances.some(i => i === operatingInstance);
-
-        if (!isExist && operatingInstance) {
-          if (instancesLength > 0) {
-            this.operatingInstance = instances[length - 1];
-            return;
-          }
-
-          this.operatingInstance = null;
-        }
-      },
-    );
-  }
-
-  @action handleTabClick = (activeKey) => {
-    this.activeKey = activeKey;
-  };
-
-  @action handleInstanceClick = (clickedInstance) => {
-    const { operatingInstance } = this;
+  handleInstanceClick = (clickedInstance) => {
+    const { buildStore } = this.props;
 
     this.handleTabClick('edit');
 
-    if (operatingInstance !== clickedInstance) {
-      this.operatingInstance = clickedInstance;
+    if (buildStore.operatingInstance !== clickedInstance) {
+      buildStore.setOperatingInstance(clickedInstance);
     }
   };
 
   @action handleAddInstance = ({ name, propsSchema, type, path }) => {
+    const { buildStore } = this.props;
+    const { instances } = buildStore;
+
     const model = new Props(propsSchema);
     const identifier = `${name}-${uuid()}`;
     const instance = {
@@ -86,20 +59,19 @@ export default class Build extends PureComponent {
       index: componentCount(name),
       path,
       name,
-      propsSchema,
       type,
       model,
     };
 
-    this.instances.push(instance);
-    this.operatingInstance = instance;
+    instances.push(instance);
+    buildStore.setOperatingInstance(instance);
 
     message.success(`添加组件「 ${name} 」成功`);
   };
 
   buildHandleDeleteInstance = instance => action(() => {
     const { name, index: instanceIndex } = instance;
-    const { instances } = this;
+    const { instances } = this.props.buildStore;
     const arrayIndex = instances.findIndex(x => x.id === instance.id);
 
     instances.splice(arrayIndex, 1);
@@ -110,17 +82,6 @@ export default class Build extends PureComponent {
   buildSortableInstance = (item) => {
     const { index, model: { data }, name } = item;
 
-    // const canvas = document.createElement('canvas');
-    // canvas.setAttribute('id', `canvas-${id}`);
-    // const context = canvas.getContext('2d');
-
-    // rasterizeHTML.drawHTML(html).then(({ image }) => {
-    //   context.drawImage(image, 10, 25);
-    //   document.body.appendChild(image);
-    //   console.log(image);
-    // });
-
-    // return `${name} - ${index} ${JSON.stringify(data)}`;
     return (
       <div className={s.sortableItemWrapper}>
         <div className={s.sortableItem}>
@@ -139,57 +100,101 @@ export default class Build extends PureComponent {
   };
 
   @action handleSortEnded = (sortedInstances) => {
-    this.instances = sortedInstances;
+    this.props.buildStore.setInstances(sortedInstances);
   };
 
+  handleUpload = () => {
+    const { buildStore } = this.props;
+
+    buildStore.create()
+    .then(() => {
+      message.success('上传配置成功');
+    })
+    .catch(() => {
+      message.error('上传配置失败');
+    });
+  };
+
+  componentWillMount() {
+    const { buildStore } = this.props;
+
+    this.operatingInstanceDisposer = reaction(
+      () => buildStore.instances.length,
+      (instancesLength) => {
+        if (instancesLength === 0) {
+          buildStore.setOperatingInstance(null);
+
+          return;
+        }
+
+        const { operatingInstance, instances } = buildStore;
+        const isExist = instances.some(i => i === operatingInstance);
+
+        if (!isExist && operatingInstance) {
+          buildStore.setOperatingInstance(instances[instancesLength - 1]);
+        }
+      },
+    );
+  }
+
+  componentWillUnmount() {
+    this.operatingInstanceDisposer();
+  }
+
   render() {
-    const { operatingInstance, activeKey, instances } = this;
+    const { operatingInstance, activeKey, instances } = this.props.buildStore;
 
     return (
-      <div className={s.root}>
-        <div className={s.instances}>
-          <InstancesList
-            instances={instances}
-            onInstanceClick={this.handleInstanceClick}
-          />
+      <div>
+        <Row>
+          <Col span={24}>
+            <Button type="primary" onClick={this.handleUpload}>上传页面</Button>
+          </Col>
+        </Row>
+        <div className={s.main}>
+          <div className={s.instances}>
+            <InstancesList
+              instances={instances}
+              onInstanceClick={this.handleInstanceClick}
+            />
+          </div>
+
+          <div className={s.controls}>
+            <Tabs
+              activeKey={activeKey}
+              onTabClick={this.handleTabClick}
+            >
+              <TabPane
+                key="list"
+                tab="列表"
+              >
+                <SortableList
+                  data={instances.toJS()}
+                  render={this.buildSortableInstance}
+                  onSortEnded={this.handleSortEnded}
+                />
+              </TabPane>
+
+              <TabPane
+                key="edit"
+                tab="编辑"
+              >
+                <OperationPanel
+                  instance={operatingInstance}
+                />
+              </TabPane>
+
+              <TabPane
+                key="libraries"
+                tab="组件库"
+              >
+                <ModuleLibraries
+                  onAdd={this.handleAddInstance}
+                />
+              </TabPane>
+            </Tabs>
+          </div>
         </div>
-
-        <div className={s.controls}>
-          <Tabs
-            activeKey={activeKey}
-            onTabClick={this.handleTabClick}
-          >
-            <TabPane
-              key="list"
-              tab="列表"
-            >
-              <SortableList
-                data={instances.toJS()}
-                render={this.buildSortableInstance}
-                onSortEnded={this.handleSortEnded}
-              />
-            </TabPane>
-
-            <TabPane
-              key="edit"
-              tab="编辑"
-            >
-              <OperationPanel
-                instance={operatingInstance}
-              />
-            </TabPane>
-
-            <TabPane
-              key="libraries"
-              tab="组件库"
-            >
-              <ModuleLibraries
-                onAdd={this.handleAddInstance}
-              />
-            </TabPane>
-          </Tabs>
-        </div>
-
       </div>
     );
   }

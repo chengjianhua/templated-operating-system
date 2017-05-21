@@ -34,28 +34,34 @@ router.route('')
 
     // const pageBuildSocket = req.io.of(`/page/build/${id}`);
 
-    // cp.spawnSync(`${nodeBin}`, [
-    //   bundleCli,
-    //   '-pd',
-    //   JSON.stringify(result),
-    // ], {
-    //   cwd: rootDir,
-    //   stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
-    // })
-    // .on('message', (data) => {
-    //   console.log(data);
-    // })
-    // .on('error', (error) => {
-    //   console.error(error);
-    // });
+    const bundleProcess = cp.spawn(`${nodeBin}`, [
+      bundleCli,
+      '--pageData',
+      JSON.stringify(result),
+    ], {
+      cwd: rootDir,
+      stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
+      // stdio: ['ipc'],
+    })
+    .on('message', (data) => {
+      console.log(data);
+    })
+    .on('error', (error) => {
+      console.error(error);
+    })
+    .on('exit', () => {
+      res.json({
+        page: result,
+      });
+    });
 
-    // bundlePage(result);
+    bundleProcess.send('Parent process send message.');
 
     // pageBuildSocket
 
-    res.json({
-      page: result,
-    });
+    // res.json({
+    //   page: result,
+    // });
   } catch (error) {
     res.status(500);
   }

@@ -126,11 +126,20 @@ export default class Build extends PureComponent {
     const { buildStore } = this.props;
 
     buildStore.create()
-    .then(() => {
+    .then(({ data: { page } }) => {
       message.success('上传配置成功');
+
+      const { _id: id } = page;
+
+      const url = `${window.location.origin}/pages/${id}/index.html`;
+
+      console.log(url);
+
+      window.open(url);
     })
-    .catch(() => {
+    .catch((error) => {
       message.error('上传配置失败');
+      console.error(error);
     });
   };
 

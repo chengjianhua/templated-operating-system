@@ -41,11 +41,15 @@ export default class StyleWrapper extends Component {
     this.initializeStyleModel();
   }
 
-  componentDidMount() {
+  initializeStylesFromDOM() {
     const { el } = this;
     const node = findDOMNode(el);
     const styleObject = window.getComputedStyle(node);
     this.model.initializeFromDOM(styleObject);
+  }
+
+  componentDidMount() {
+    this.initializeStylesFromDOM();
   }
 
   componentWillUnmount() {

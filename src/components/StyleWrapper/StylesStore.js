@@ -3,6 +3,8 @@
 import StyleModel from './StyleModel';
 
 export default class StylesStore {
+  readonly = false;
+
   styles = {};
 
   addStyle(style) {
@@ -34,5 +36,23 @@ export default class StylesStore {
 
       return acc;
     }, {});
+  }
+
+  turnReadonly() {
+    this.readonly = true;
+
+    return this;
+  }
+
+  // turnEditable() {
+  //   this.readonly = false;
+  // }
+
+  static fromJS(styles) {
+    const store = new StylesStore();
+
+    store.styles = styles;
+
+    return store;
   }
 }

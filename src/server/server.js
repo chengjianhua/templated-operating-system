@@ -1,5 +1,7 @@
 import path from 'path';
+import http from 'http';
 import express from 'express';
+import socketIo from 'socket.io';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import expressJwt from 'express-jwt';
@@ -29,6 +31,8 @@ import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 // import { port, auth } from '../config';
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 
 //
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
@@ -45,6 +49,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.use('/pages', express.static(path.join(__dirname, 'pages')));
 //
 // Authentication
 // -----------------------------------------------------------------------------
@@ -58,6 +63,13 @@ app.use(expressJwt({
 if (__DEV__) {
   app.enable('trust proxy');
 }
+
+// use socket.io middleware
+app.use((req, res, next) => {
+  req.io = io;
+
+  next();
+});
 
 //
 // Register API middleware
@@ -152,7 +164,7 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 // Launch the server
 // -----------------------------------------------------------------------------
 /* eslint-disable no-console */
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`The server is running at http://localhost:${port}/`);
 });
 /* eslint-enable no-console */

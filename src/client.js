@@ -4,7 +4,6 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 import serverStyleCleanup from 'node-style-loader/clientCleanup';
 import FastClick from 'fastclick';
 // import queryString from 'query-string';
-// import { createPath } from 'history/PathUtils';
 import {
   BrowserRouter as Router,
 } from 'react-router-dom';
@@ -12,7 +11,6 @@ import {
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
-// import history from './core/history';
 import { ErrorReporter, deepForceUpdate } from './core/devUtils';
 // import { updateMeta } from './core/DOMUtils';
 
@@ -47,7 +45,7 @@ function render(App) {
 }
 
 let App = require('./components/App').default;
-// eslint-disable-next-line
+
 let appInstance = render(App);
 
 // remove the style tag which [className="server-style-loader-element"]

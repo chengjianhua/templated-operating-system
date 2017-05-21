@@ -4,7 +4,7 @@ import { Provider } from 'mobx-react';
 import { Route } from 'react-router-dom';
 
 import Build from './Build';
-import BuildStore from './model/Build';
+import BuildStore from './model/BuildStore';
 
 import StylesStore from '../../components/StyleWrapper/StylesStore';
 

@@ -3,7 +3,7 @@ import { action, reaction } from 'mobx';
 // import PropTypes from 'prop-types';
 import uuid from 'uuid/v1';
 import { observer, inject } from 'mobx-react';
-import { Row, Col, Tabs, Icon, message, Button } from 'antd';
+import { Row, Col, Tabs, Icon, message, Button, Modal } from 'antd';
 
 import SortableList from '../../components/SortableList';
 
@@ -17,16 +17,19 @@ import s from './Build.css';
 
 const { TabPane } = Tabs;
 
-const countMap = {};
-const componentCount = (name) => {
-  if (countMap[name]) {
-    countMap[name] += 1;
-  } else {
-    countMap[name] = 1;
-  }
+const componentCount = (function () {
+  const countMap = {};
 
-  return countMap[name];
-};
+  return function (name) {
+    if (countMap[name]) {
+      countMap[name] += 1;
+    } else {
+      countMap[name] = 1;
+    }
+
+    return countMap[name];
+  };
+}());
 
 /* eslint react/prop-types: ['error', { ignore: ['buildStore'] }] */
 @inject('buildStore')
@@ -103,6 +106,22 @@ export default class Build extends PureComponent {
     this.props.buildStore.setInstances(sortedInstances);
   };
 
+  handleUploadButtonClick = () => {
+    const { instances } = this.props.buildStore;
+
+    if (instances.length === 0) {
+      message.info('不能上传空列表');
+
+      return;
+    }
+
+    Modal.confirm({
+      title: '是否上传配置',
+      maskClosable: true,
+      onOk: this.handleUpload,
+    });
+  };
+
   handleUpload = () => {
     const { buildStore } = this.props;
 
@@ -148,7 +167,7 @@ export default class Build extends PureComponent {
       <div>
         <Row>
           <Col span={24}>
-            <Button type="primary" onClick={this.handleUpload}>上传页面</Button>
+            <Button type="primary" onClick={this.handleUploadButtonClick}>上传页面</Button>
           </Col>
         </Row>
         <div className={s.main}>

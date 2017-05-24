@@ -1,0 +1,25 @@
+.root {
+  :global(.ant-form-item-label),
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-transform: uppercase;
+  }
+}
+
+.hr {
+  border: none;
+  /*border-top: 1px solid rgba(17, 142, 233, .5);*/
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 2em 0;
+}
+
+.propsInputsContainer {
+
+}
+
+.stylesInputsContainer {
+}

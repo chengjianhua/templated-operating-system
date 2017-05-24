@@ -1,0 +1,43 @@
+.moduleWrapper {
+  position: relative;
+
+  &:not(:last-of-type) {
+    margin-bottom: 10px;
+  }
+
+  &:hover {
+    & .operations {
+      /*transform: translateY(-50%);*/
+      transform: translateX(0);
+    }
+  }
+
+  .module {
+    border: 1px dashed rgba(0, 0, 0, 0.2);
+    border-width: 0.5px;
+  }
+
+  .operations {
+    background: #fff;
+    padding: 8px;
+    transition: 0.3s all ease;
+    /*border-radius: 4px;*/
+    box-shadow: 8px 4px 5px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    right: 0;
+    /*top: 50%;*/
+    /*transform: translateX(100%) translateY(-50%);*/
+    transform: translateX(100%);
+    top: 5px;
+
+    .icon {
+      font-size: 24px;
+      vertical-align: middle;
+      cursor: pointer;
+
+      &:global(.anticon-plus-circle-o) {
+        color: green;
+      }
+    }
+  }
+}

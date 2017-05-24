@@ -1,0 +1,58 @@
+{
+    "_id" : "59200f32cfe3871342f65615",
+    "instances" : [
+        {
+            "id" : "Button-6a7eddf0-3d40-11e7-bbe3-efd6f8269d8d",
+            "index" : 1,
+            "path" : "Button/Button.js",
+            "name" : "Button",
+            "data" : {
+                "label" : "我是一个按钮",
+                "fullWidth" : true
+            }
+        },
+        {
+            "id" : "ImageCard-6b213870-3d40-11e7-bbe3-efd6f8269d8d",
+            "index" : 1,
+            "path" : "ImageCard/ImageCard.js",
+            "name" : "ImageCard",
+            "data" : {
+                "user" : {
+                    "avatar" : "https://api.adorable.io/avatars/100/jianhua.cheng",
+                    "nick" : "Avatar",
+                    "signature" : "To be or not to be."
+                }
+            }
+        }
+    ],
+    "styles" : {
+        "Button-6a7eddf0-3d40-11e7-bbe3-efd6f8269d8d" : {
+            "id" : "Button-6a7eddf0-3d40-11e7-bbe3-efd6f8269d8d",
+            "center" : true,
+            "fixed" : "",
+            "style" : {
+                "width" : "375px",
+                "height" : "49.5px",
+                "lineHeight" : "50px",
+                "margin" : "0px",
+                "padding" : "0px",
+                "backgroundImage" : "none",
+                "backgroundColor" : "rgb(79, 203, 25)"
+            }
+        },
+        "ImageCard-6b213870-3d40-11e7-bbe3-efd6f8269d8d" : {
+            "id" : "ImageCard-6b213870-3d40-11e7-bbe3-efd6f8269d8d",
+            "center" : true,
+            "fixed" : "",
+            "style" : {
+                "width" : "375px",
+                "height" : "698.391px",
+                "lineHeight" : "20.25px",
+                "margin" : "0px",
+                "padding" : "0px",
+                "backgroundImage" : "none",
+                "backgroundColor" : "rgb(255, 255, 255)"
+            }
+        }
+    }
+}

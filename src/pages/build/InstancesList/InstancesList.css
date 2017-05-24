@@ -1,0 +1,14 @@
+.instances {
+
+}
+
+.instance {
+  &:hover {
+    filter: saturate(200%);
+    cursor: context-menu;
+  }
+
+  * {
+    transition: all 0.3s ease;
+  }
+}

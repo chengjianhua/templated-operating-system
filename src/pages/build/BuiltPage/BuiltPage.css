@@ -1,0 +1,13 @@
+@global-import 'normalize.css';
+
+:focus {
+  outline: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+.root {
+
+}

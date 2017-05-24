@@ -14,13 +14,13 @@
   "plugins": [
     "transform-decorators-legacy",
     ["module-resolver", {
-      "root": ["./src"],
       "alias": {
-        "components": "components",
-        "core": "core",
-        "pages": "pages",
-        "server": "server",
-        "config": "config"
+        "components": "./src/components",
+        "core": "./src/core",
+        "pages": "./src/pages",
+        "server": "./src/server",
+        "config": "./src/config",
+        "constants": "./src/constants"
       }
     }]
   ],

@@ -1,11 +1,15 @@
 /* eslint-disable max-len */
 
-import dbConfig from '../mongodb.json';
+import mongodbConfigs from '../mongodb.json';
+
+function getMongodbUrl({ host, port, user, pwd, database }) {
+  return `mongodb://${user}:${pwd}@${host}:${port}/${database}`;
+}
 
 export const port = process.env.PORT || 4000;
 export const host = process.env.WEBSITE_HOSTNAME || `localhost:${port}`;
 
-export const databaseUrl = process.env.DATABASE_URL || dbConfig.url;
+export const databaseUrl = process.env.DATABASE_URL || getMongodbUrl(mongodbConfigs.tosRead);
 
 export const analytics = {
 

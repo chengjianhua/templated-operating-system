@@ -1,4 +1,5 @@
 import path from 'path';
+import chalk from 'chalk';
 import http from 'http';
 import express from 'express';
 import socketIo from 'socket.io';
@@ -16,13 +17,17 @@ import { collectInitial } from 'node-style-loader/collect';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-import { port, auth } from 'config';
+import kueUiExpress from 'kue-ui-express';
+
 import 'core/ssrPolyfill';
+import { port, auth } from 'config';
+
 import App from 'components/App';
 import Html from 'components/Html';
 import ErrorPage from 'pages/error/ErrorPage';
 
 import apiRouter from 'server/api';
+import kueQueue, { kue } from 'server/kueQueue';
 
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 
@@ -66,7 +71,10 @@ if (__DEV__) {
 
 // use socket.io middleware
 app.use((req, res, next) => {
-  req.io = io;
+  Object.assign(req, {
+    io,
+    // kueQueue,
+  });
 
   next();
 });
@@ -75,6 +83,10 @@ app.use((req, res, next) => {
 // Register API middleware
 // -----------------------------------------------------------------------------
 app.use('/api', apiRouter);
+
+// use kue-ui-express
+kueUiExpress(app, '/kue/', '/api/kue/');
+app.use('/api/kue/', kue.app);
 
 //
 // Register server-side rendering middleware
@@ -167,4 +179,16 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 server.listen(port, () => {
   console.log(`The server is running at http://localhost:${port}/`);
 });
-/* eslint-enable no-console */
+
+process.once('SIGTERM', (sig) => {
+  console.log(chalk.yellow('Waiting for shutdown kue ...'));
+
+  kueQueue.shutdown(5000, (err) => {
+    if (err) {
+      console.error(chalk.red('Kue shutdown occurs error: '), err);
+    }
+
+    console.log(chalk.yellow('Kue has been shutdown.'));
+    process.exit(sig);
+  });
+});

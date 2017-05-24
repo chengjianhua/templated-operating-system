@@ -1,9 +1,9 @@
-import { jsdom } from 'jsdom';
+import { JSDOM } from 'jsdom';
 
 const exposedProperties = ['window', 'navigator', 'document'];
 
-global.document = jsdom('');
-global.window = document.defaultView;
+global.window = new JSDOM('').window;
+global.document = global.window.document;
 
 /**
  * this is a polyfill

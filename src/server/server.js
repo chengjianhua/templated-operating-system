@@ -1,8 +1,7 @@
 import path from 'path';
 import chalk from 'chalk';
-import http from 'http';
 import express from 'express';
-import socketIo from 'socket.io';
+// import socketIO from 'socket.io';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import expressJwt from 'express-jwt';
@@ -26,8 +25,9 @@ import App from 'components/App';
 import Html from 'components/Html';
 import ErrorPage from 'pages/error/ErrorPage';
 
-import apiRouter from 'server/api';
+// import apiRouter from 'server/api';
 import kueQueue, { kue } from 'server/kueQueue';
+import getIO, { initialize as initializeIO } from 'server/io';
 
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 
@@ -36,8 +36,8 @@ import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 // import { port, auth } from '../config';
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
+const server = initializeIO(app);
+const io = getIO();
 
 //
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
@@ -79,10 +79,16 @@ app.use((req, res, next) => {
   next();
 });
 
+io.on('connection', () => {
+  console.log('Client connected to the server.');
+});
+
 //
 // Register API middleware
 // -----------------------------------------------------------------------------
-app.use('/api', apiRouter);
+// dynamic require because of the io should be initialized before require the api
+// router, the router referred the variable io
+app.use('/api', require('server/api').default);
 
 // use kue-ui-express
 kueUiExpress(app, '/kue/', '/api/kue/');

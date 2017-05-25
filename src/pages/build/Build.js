@@ -3,7 +3,7 @@ import { action, reaction } from 'mobx';
 // import PropTypes from 'prop-types';
 import uuid from 'uuid/v1';
 import { observer, inject } from 'mobx-react';
-import { Row, Col, Tabs, Icon, message, Button, Modal } from 'antd';
+import { Row, Col, Tabs, Icon, message, Button, Modal, notification } from 'antd';
 
 import SortableList from '../../components/SortableList';
 
@@ -128,14 +128,6 @@ export default class Build extends PureComponent {
     buildStore.create()
     .then(({ data: { page } }) => {
       message.success('上传配置成功');
-
-      const { _id: id } = page;
-
-      const url = `${window.location.origin}/pages/${id}/index.html`;
-
-      console.log(url);
-
-      window.open(url);
     })
     .catch((error) => {
       message.error('上传配置失败');
@@ -163,6 +155,23 @@ export default class Build extends PureComponent {
         }
       },
     );
+  }
+
+  componentDidMount() {
+    const { buildStore } = this.props;
+
+    buildStore.socket
+    .on('ended', ({ id }) => {
+      const url = `${window.location.origin}/pages/${id}/index.html`;
+
+      notification.success({
+        message: `页面 [${id}] 构建完成`,
+        description: (
+          <a rel="noopener noreferrer" target="_blank" href={url}>{url}</a>
+        ),
+        duration: 0,
+      });
+    });
   }
 
   componentWillUnmount() {

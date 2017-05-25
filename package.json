@@ -43,6 +43,7 @@
     "core-js": "^2.4.1",
     "express": "^4.14.1",
     "express-jwt": "^5.1.0",
+    "express-once": "^0.1.0",
     "fastclick": "^1.0.6",
     "history": "^4.5.1",
     "html-webpack-plugin": "^2.28.0",

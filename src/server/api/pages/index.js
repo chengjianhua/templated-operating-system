@@ -7,6 +7,7 @@ import { Job } from 'kue';
 import { IONamespaces } from 'constants';
 import Pages from 'server/data/Pages';
 import queue, { JobTypes } from 'server/kueQueue';
+import getIO from 'server/io';
 
 /* eslint-disable no-console */
 
@@ -15,8 +16,6 @@ const nodeBin = path.join(rootDir, 'node_modules/.bin/babel-node');
 const bundleCli = path.join(rootDir, 'src/pages/build/BuiltPage/tools/bundle-cli.js');
 
 const router = Router();
-
-const getNamespaceIO = req => req.io.of(IONamespaces.PAGES_BUILD);
 
 const saveErrorHandler = (err) => {
   if (!err) {
@@ -31,25 +30,25 @@ const createBuildPageJob = (data) => { // eslint-disable-line
   })
   .save(saveErrorHandler)
   .on('enqueue', () => {
-    queue.active((err, ids) => {
-      ids.forEach((id) => {
-        Job.get(id, (getJobError, activeJob) => {
-          if (err) {
-            console.error(chalk.red('Check active jobs before enqueue occurs error: '), getJobError);
-          }
+    // queue.active((err, ids) => {
+    //   ids.forEach((id) => {
+    //     Job.get(id, (getJobError, activeJob) => {
+    //       if (err) {
+    //         console.error(chalk.red('Check active jobs before enqueue occurs error: '), getJobError);
+    //       }
 
-          const killCommand = `pkill ${activeJob.data.pid}`;
+    //       const killCommand = `pkill ${activeJob.data.pid}`;
 
-          cp.exec(killCommand, (killError) => {
-            if (!killError) {
-              console.log(`${chalk.yellow(killCommand)} successfully.`);
-            }
-          });
+    //       cp.exec(killCommand, (killError) => {
+    //         if (!killError) {
+    //           console.log(`${chalk.yellow(killCommand)} successfully.`);
+    //         }
+    //       });
 
-          activeJob.inactive();
-        });
-      });
-    });
+    //       activeJob.inactive();
+    //     });
+    //   });
+    // });
   });
 };
 
@@ -80,13 +79,11 @@ queue.process(JobTypes.BUILD_PAGE, (job, done) => {
   job.update();
 });
 
-router.use((req, res, next) => {
-  getNamespaceIO(req)
-  .on('connection', (socket) => {
-    console.log(chalk.cyan(`Client connected. ${socket.ip}`));
-  });
+const nsp = getIO().of(IONamespaces.PAGES_BUILD)
+.on('connect', (socket) => {
+  console.log(chalk.cyan(`Client connected to this server.`));
 
-  return next();
+  nsp.emit('pages', 'connected');
 });
 
 router.route('')
@@ -109,14 +106,14 @@ router.route('')
       page,
     })
     .on('complete', () => {
-      res.json({
-        page,
+      nsp.emit('ended', {
+        id,
       });
     });
 
-    // const pageBuildSocket = req.io.of(`/page/build/${id}`);
-
-    // pageBuildSocket
+    res.json({
+      page,
+    });
   } catch (error) {
     res.status(500);
   }

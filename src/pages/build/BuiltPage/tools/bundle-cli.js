@@ -12,7 +12,7 @@ const { _id: id } = page;
 
 const bundleLog = `Bundle process for building page [${id}]`;
 
-console.log(chalk.green(`${bundleLog} started: `));
+console.log(chalk.green(`\n${bundleLog} started: `));
 
 bundlePage(page)
 .then(() => {

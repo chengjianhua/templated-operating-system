@@ -8,11 +8,13 @@ import {
   BrowserRouter as Router,
 } from 'react-router-dom';
 
+// import io from 'core/socket';
+// import { IONamespaces } from 'constants';
+
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 import { ErrorReporter, deepForceUpdate } from './core/devUtils';
-// import { updateMeta } from './core/DOMUtils';
 
 injectTapEventPlugin();
 
@@ -25,6 +27,13 @@ injectTapEventPlugin();
 setTimeout(() => {
   serverStyleCleanup();
 }, 3000);
+
+// const socket = io(IONamespaces.PAGES_BUILD);
+
+// socket.on('pages', () => {
+//   console.log('asdadasdasdasd');
+// });
+
 
 // Make taps on links and buttons work fast on mobiles
 FastClick.attach(document.body);

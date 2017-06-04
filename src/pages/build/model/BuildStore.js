@@ -8,7 +8,7 @@ import io from 'core/socket';
 class BuildStore {
   id;
   stylesStore;
-  socket = io(IONamespaces.PAGES_BUILD);
+  socket;
   @observable instances = [];
   @observable operatingInstance;
   @observable activeKey = 'libraries';
@@ -20,10 +20,14 @@ class BuildStore {
   }
 
   initializeSocket() {
-    this.socket
+    const socket = io(IONamespaces.PAGES_BUILD)
     .on('connect', () => {
       console.log(`Client has connected to the nsp: [${IONamespaces.PAGES_BUILD}].`);
     });
+
+    this.socket = socket;
+
+    return this;
   }
 
   // TODO: add save

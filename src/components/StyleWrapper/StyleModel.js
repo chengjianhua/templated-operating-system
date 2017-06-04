@@ -1,7 +1,12 @@
-import { observable, action, computed, extendObservable } from 'mobx';
 import set from 'lodash/set';
 import get from 'lodash/get';
 import kebabCase from 'lodash/kebabCase';
+import {
+  observable,
+  action,
+  computed,
+  extendObservable,
+} from 'mobx';
 
 const defaultStyle = {
   width: 'auto',

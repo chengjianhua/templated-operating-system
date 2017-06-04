@@ -79,10 +79,6 @@ app.use((req, res, next) => {
   next();
 });
 
-io.on('connection', () => {
-  console.log('Client connected to the server.');
-});
-
 //
 // Register API middleware
 // -----------------------------------------------------------------------------

@@ -30,25 +30,27 @@ const createBuildPageJob = (data) => { // eslint-disable-line
   })
   .save(saveErrorHandler)
   .on('enqueue', () => {
-    // queue.active((err, ids) => {
-    //   ids.forEach((id) => {
-    //     Job.get(id, (getJobError, activeJob) => {
-    //       if (err) {
-    //         console.error(chalk.red('Check active jobs before enqueue occurs error: '), getJobError);
-    //       }
+    queue.active((err, ids) => {
+      ids.forEach((id) => {
+        Job.get(id, (getJobError, activeJob) => {
+          if (err) {
+            console.error(chalk.red('Check active jobs before enqueue occurs error: '), getJobError);
+          }
 
-    //       const killCommand = `pkill ${activeJob.data.pid}`;
+          if (activeJob.data.id === data.id) {
+            const killCommand = `pkill ${activeJob.data.pid}`;
 
-    //       cp.exec(killCommand, (killError) => {
-    //         if (!killError) {
-    //           console.log(`${chalk.yellow(killCommand)} successfully.`);
-    //         }
-    //       });
+            cp.exec(killCommand, (killError) => {
+              if (!killError) {
+                console.log(`${chalk.yellow(killCommand)} successfully.`);
+              }
+            });
 
-    //       activeJob.inactive();
-    //     });
-    //   });
-    // });
+            activeJob.remove();
+          }
+        });
+      });
+    });
   });
 };
 
@@ -81,9 +83,7 @@ queue.process(JobTypes.BUILD_PAGE, (job, done) => {
 
 const nsp = getIO().of(IONamespaces.PAGES_BUILD)
 .on('connect', (socket) => {
-  console.log(chalk.cyan(`Client connected to this server.`));
-
-  nsp.emit('pages', 'connected');
+  console.log(chalk.cyan(`Client [${socket.client.conn.remoteAddress}] connected to this server.`));
 });
 
 router.route('')

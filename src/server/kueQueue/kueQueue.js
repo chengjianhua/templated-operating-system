@@ -22,16 +22,16 @@ const queue = kue.createQueue({
           return new Error('Retry time exhausted');
         }
         if (options.attempt > 10) {
-            // End reconnecting with built in error
+          // End reconnecting with built in error
           return undefined;
         }
+
+        console.log('Kue redis reconnected.');
         // reconnect after
         return Math.min(options.attempt * 100, 3000);
       },
     },
   },
 });
-
-// kue.app.listen(5555);
 
 export default queue;
